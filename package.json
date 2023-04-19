@@ -1,10 +1,9 @@
 {
     "name": "darco2903-os-command-kit",
     "version": "1.0.0",
-    "description": "",
-    "main": "index.js",
+    "description": "Cross-platform commands working with Node.js",
+    "main": "",
     "scripts": {
-        "rm": "node src/rm.js",
         "test-rm": "node test/test_rm.js"
     },
     "bin": {

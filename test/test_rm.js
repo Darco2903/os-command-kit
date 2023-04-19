@@ -3,15 +3,15 @@ const fs = require("fs");
 const path = require("path");
 const colors = require("console-log-colors");
 
-const script = path.join(process.cwd(), "src/rm.js");
 const runTest = "runTest";
 const dir1 = "1";
 const dir2 = "2";
 const file = "file";
 let nbErrors = 0;
+const script = path.join(process.cwd(), "src/rm.js");
 
 function exe(...p) {
-    return `node ${script} ./${path.join(...p)}`;
+    return `node ${script} "./${path.join(...p)}"`;
 }
 
 /* ------------ initialization of the test ------------ */
@@ -47,8 +47,10 @@ function test1() {
         if (!fs.readdirSync(".").includes(file)) {
             throw new Error("File not exist before test");
         }
-        const test = execSync(exe(file));
-        if (fs.readdirSync(".").includes(file) || test.byteLength > 0) {
+        const cmd = exe(file);
+        console.log(cmd);
+        execSync(cmd);
+        if (fs.readdirSync(".").includes(file)) {
             throw new Error("File not deleted");
         }
         console.log(colors.green("Test 1 passed"));
@@ -61,15 +63,17 @@ function test1() {
 
 /* ---------------------------------------------------- */
 
-/* TEST 2: delete exp *.js  */
+/* TEST 2: delete exp `*.js`  */
 
 function test2() {
     try {
         if (!fs.readdirSync(dir1).includes("0.js")) {
             throw new Error("File not exist before test");
         }
-        const test = execSync(exe(dir1, "*.js"));
-        if (test.byteLength != 0 || fs.readdirSync(dir1).includes(".js")) {
+        const cmd = exe(dir1, "*.js");
+        console.log(cmd);
+        execSync(cmd);
+        if (fs.readdirSync(dir1).includes(".js")) {
             throw new Error("File not deleted");
         }
         console.log(colors.green("Test 2 passed"));
@@ -82,15 +86,17 @@ function test2() {
 
 /* ---------------------------------------------------- */
 
-/* TEST 3: delete exp a.txt  */
+/* TEST 3: delete exp `a.txt`  */
 
 function test3() {
     try {
         if (!fs.readdirSync(dir1).includes("a.txt")) {
             throw new Error("File not exist before test");
         }
-        const test = execSync(exe(dir1, "a.txt"));
-        if (test.byteLength != 0 || fs.readdirSync(dir1).includes("a.txt")) {
+        const cmd = exe(dir1, "a.txt");
+        console.log(cmd);
+        execSync(cmd);
+        if (fs.readdirSync(dir1).includes("a.txt")) {
             throw new Error("File not deleted");
         }
         console.log(colors.green("Test 3 passed"));
@@ -103,15 +109,22 @@ function test3() {
 
 /* ---------------------------------------------------- */
 
-/* TEST 4: delete exp b*  */
+/* ---------------------------------------------------- */
+
+/* TEST 4: silent mode  */
 
 function test4() {
     try {
         if (!fs.readdirSync(dir1).includes("b.txt")) {
             throw new Error("File not exist before test");
         }
-        const test = execSync(exe(dir1, "b*"));
-        if (test.byteLength != 0 || fs.readdirSync(dir1).includes("b.txt")) {
+        const cmd = exe(dir1, "b.txt");
+        console.log(cmd);
+        const test = execSync(`${cmd}`);
+        if (test.byteLength != 0) {
+            throw new Error("Silent mode failed");
+        }
+        if (fs.readdirSync(dir1).includes("b.txt")) {
             throw new Error("File not deleted");
         }
         console.log(colors.green("Test 4 passed"));
@@ -124,15 +137,17 @@ function test4() {
 
 /* ---------------------------------------------------- */
 
-/* TEST 5: delete exp *  */
+/* TEST 5: delete exp `c*`  */
 
 function test5() {
     try {
         if (!fs.readdirSync(dir1).includes("c.txt")) {
             throw new Error("File not exist before test");
         }
-        const test = execSync(exe(dir1, "*"));
-        if (test.byteLength != 0 || fs.readdirSync(dir1).length != 0) {
+        const cmd = exe(dir1, "c*");
+        console.log(cmd);
+        execSync(cmd);
+        if (fs.readdirSync(dir1).includes("c.txt")) {
             throw new Error("File not deleted");
         }
         console.log(colors.green("Test 5 passed"));
@@ -145,16 +160,18 @@ function test5() {
 
 /* ---------------------------------------------------- */
 
-/* TEST 6: delete empty dir  */
+/* TEST 6: delete exp `path/*`  */
 
 function test6() {
     try {
-        if (fs.readdirSync(dir1).length != 0) {
-            throw new Error("Directory not empty before test");
+        if (!fs.readdirSync(dir1).includes("d.txt")) {
+            throw new Error("File not exist before test");
         }
-        const test = execSync(exe(dir1));
-        if (test.byteLength != 0 || fs.existsSync(dir1)) {
-            throw new Error("Directory not deleted");
+        const cmd = exe(dir1, "*");
+        console.log(cmd);
+        execSync(cmd);
+        if (fs.readdirSync(dir1).length != 0) {
+            throw new Error("File not deleted");
         }
         console.log(colors.green("Test 6 passed"));
     } catch (error) {
@@ -166,15 +183,18 @@ function test6() {
 
 /* ---------------------------------------------------- */
 
-/* TEST 7: delete dir with files  */
+/* TEST 7: delete empty dir  */
 
 function test7() {
     try {
-        if (fs.readdirSync(dir2).length != 10) {
+        fs.readdirSync(dir1).forEach((f) => fs.rmSync(path.join(dir1, f)));
+        if (fs.readdirSync(dir1).length != 0) {
             throw new Error("Directory not empty before test");
         }
-        const test = execSync(exe(dir2));
-        if (test.byteLength != 0 || fs.existsSync(dir2)) {
+        const cmd = exe(dir1);
+        console.log(cmd);
+        execSync(cmd);
+        if (fs.existsSync(dir1)) {
             throw new Error("Directory not deleted");
         }
         console.log(colors.green("Test 7 passed"));
@@ -182,6 +202,29 @@ function test7() {
         nbErrors++;
         console.log(error.toString());
         console.log(colors.red("Test 7 failed"));
+    }
+}
+
+/* ---------------------------------------------------- */
+
+/* TEST 8: delete dir with files  */
+
+function test8() {
+    try {
+        if (fs.readdirSync(dir2).length != 10) {
+            throw new Error("Directory not empty before test");
+        }
+        const cmd = exe(dir2);
+        console.log(cmd);
+        execSync(cmd);
+        if (fs.existsSync(dir2)) {
+            throw new Error("Directory not deleted");
+        }
+        console.log(colors.green("Test 8 passed"));
+    } catch (error) {
+        nbErrors++;
+        console.log(error.toString());
+        console.log(colors.red("Test 8 failed"));
     }
 }
 
@@ -203,6 +246,8 @@ test6();
 console.log("------------------------------------");
 test7();
 console.log("------------------------------------");
+test8();
+console.log("------------------------------------");
 
 if (nbErrors === 0) {
     console.log(colors.green("All tests passed"));
@@ -211,4 +256,4 @@ if (nbErrors === 0) {
 }
 
 process.chdir(__dirname);
-fs.rmSync(runTest, { recursive: true });
+// fs.rmSync(runTest, { recursive: true });
