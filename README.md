@@ -19,7 +19,7 @@
 ```
 
 > Supported expressions: **`"path/*"`** | **`"path/file*"`** | **`"path/*.ext"`**
-
+>
 > :warning: if using expression you must use quotes to avoid shell expansion
 
 | Option | Description   |
@@ -27,3 +27,5 @@
 | `-h`   | Print help    |
 | `-v`   | Print version |
 | `-s`   | Silent mode   |
+
+---

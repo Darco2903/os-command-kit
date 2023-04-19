@@ -120,7 +120,7 @@ function test4() {
         }
         const cmd = exe(dir1, "b.txt");
         console.log(cmd);
-        const test = execSync(`${cmd}`);
+        const test = execSync(`${cmd} -s`);
         if (test.byteLength != 0) {
             throw new Error("Silent mode failed");
         }
@@ -256,4 +256,4 @@ if (nbErrors === 0) {
 }
 
 process.chdir(__dirname);
-// fs.rmSync(runTest, { recursive: true });
+fs.rmSync(runTest, { recursive: true });
