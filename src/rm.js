@@ -6,6 +6,8 @@ const { argv, exit } = require("process");
 
 const args = argv.slice(2);
 const expression = args[0];
+const { dir, base } = path.parse(expression);
+const verbose = args.includes("-v") ? console.log : () => {};
 
 try {
     switch (true) {
@@ -25,9 +27,6 @@ try {
         case path.dirname(expression).includes("*"):
             throw "Directory cannot contain *";
     }
-
-    const { dir, base } = path.parse(expression);
-    const verbose = args.includes("-v") ? console.log : () => {};
 
     if (fs.existsSync(expression)) {
         fs.rmSync(expression, { recursive: true });
