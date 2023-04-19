@@ -1,0 +1,19 @@
+{
+    "name": "darco2903-os-command-kit",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "rm": "node src/rm.js",
+        "test-rm": "node test/test_rm.js"
+    },
+    "bin": {
+        "rm": "./src/rm.js"
+    },
+    "keywords": [],
+    "author": "Darco2903",
+    "license": "ISC",
+    "dependencies": {
+        "console-log-colors": "^0.4.0"
+    }
+}
